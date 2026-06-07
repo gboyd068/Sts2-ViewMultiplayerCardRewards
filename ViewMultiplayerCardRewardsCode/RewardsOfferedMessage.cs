@@ -45,7 +45,7 @@ class RewardsOfferedMessage : ICustomMessage
         CardRewardsMap.Instance.Map[senderId] = groupedCards;
     }
 
-    public bool ShouldBroadcast { get; }
+    public bool ShouldBroadcast { get; } = true;
     
     public static void WriteNestedList(
         PacketWriter writer,
