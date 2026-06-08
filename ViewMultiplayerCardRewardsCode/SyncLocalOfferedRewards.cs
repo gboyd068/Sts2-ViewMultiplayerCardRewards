@@ -5,11 +5,8 @@ using BaseLib.Utils.Patching;
 using HarmonyLib;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Hooks;
-using MegaCrit.Sts2.Core.Logging;
-using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Rewards;
 using MegaCrit.Sts2.Core.Runs;
-using ViewMultiplayerRewards.ViewMultiplayerRewardsCode;
 
 namespace BaseLib.Patches.Hooks;
 
@@ -28,8 +25,7 @@ class BeforeRewardOfferedPatch
     private static async Task BeforeRewardsOfferedHooks(IRunState runState,
         Player player,
         IReadOnlyList<Reward> rewards)
-    {
-        MainFile.Logger.LogMessage(LogLevel.Info, "BeforeRewardsOfferedHooks called", 0);
+    { 
         CustomMessageWrapper.Send(new RewardsOfferedMessage(player, rewards));
     }
 }
