@@ -19,7 +19,6 @@ internal static class CardRewardViewerPatch
         cardRewardContainer.Size = new Vector2(600, 600);
         cardRewardContainer.GlobalPosition = cardContainerAbove.GlobalPosition + new Vector2(300, 900);
         rewardsLabel.GlobalPosition = cardRewardContainer.GlobalPosition + new Vector2(-40, -50);
-        // rewardsLabel.Hide();
         __instance.AddChild(rewardsLabel);
         __instance.CallDeferred(Node.MethodName.AddChild, cardRewardContainer);
         PlayerCardRewardGroupsDisplay.groupedCards = PlayerCardRewardGroupsDisplay.GetGroupedCardRewards(__instance);

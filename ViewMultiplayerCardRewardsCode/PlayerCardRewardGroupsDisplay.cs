@@ -32,7 +32,7 @@ public static class PlayerCardRewardGroupsDisplay
         var allCards = groupedCards
             .SelectMany(group => group)
             .ToList();
-        NGame.Instance.GetInspectCardScreen().Open(allCards, allCards.IndexOf(entry.Card));
+        NGame.Instance?.GetInspectCardScreen().Open(allCards, allCards.IndexOf(entry.Card));
     }
     
     public static List<List<CardModel>> GetGroupedCardRewards(

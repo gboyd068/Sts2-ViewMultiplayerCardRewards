@@ -2,8 +2,6 @@ using Godot;
 using HarmonyLib;
 using MegaCrit.Sts2.Core.Modding;
 
-namespace ViewMultiplayerRewards.ViewMultiplayerRewardsCode;
-
 //You're recommended but not required to keep all your code in this package and all your assets in the ViewMultiplayerRewards folder.
 [ModInitializer(nameof(Initialize))]
 public partial class MainFile : Node
