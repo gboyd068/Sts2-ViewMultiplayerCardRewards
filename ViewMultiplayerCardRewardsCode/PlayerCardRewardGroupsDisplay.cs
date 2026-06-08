@@ -1,5 +1,6 @@
 using Godot;
 using HarmonyLib;
+using MegaCrit.Sts2.addons.mega_text;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Nodes;
@@ -10,12 +11,13 @@ public static class PlayerCardRewardGroupsDisplay
 {
     public static List<List<CardModel>> groupedCards;
 
-    public static void Populate(Control node)
+    public static void Populate(Control node, MegaRichTextLabel label)
     {
         foreach (var group in groupedCards)
         {
             if (group.Count == 0)
                 continue;
+            label.Show();
             VBoxContainer groupContainer = new VBoxContainer();
             node.AddChild(groupContainer);
             foreach (var card in group)

@@ -3,7 +3,9 @@ using System.Reflection.Emit;
 using BaseLib.Abstracts;
 using BaseLib.Utils.Patching;
 using HarmonyLib;
+using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Players;
+using MegaCrit.Sts2.Core.Factories;
 using MegaCrit.Sts2.Core.Hooks;
 using MegaCrit.Sts2.Core.Logging;
 using MegaCrit.Sts2.Core.Models;
@@ -13,23 +15,27 @@ using MegaCrit.Sts2.Core.Runs;
 
 namespace BaseLib.Patches.Hooks;
 
-[HarmonyPatch(typeof(Hook), nameof(Hook.BeforeRewardsOffered), MethodType.Async)]
+[HarmonyPatch(
+    typeof(CardFactory),
+    nameof(CardFactory.CreateForReward),
+    new[]
+    {
+        typeof(Player),
+        typeof(int),
+        typeof(CardCreationOptions)
+    })]
 class BeforeRewardOfferedPatch
 {
-    [HarmonyTranspiler]
-    static IEnumerable<CodeInstruction> BeforeOffer(ILGenerator generator, IEnumerable<CodeInstruction> instructions,
-        MethodBase original)
-    {
-        return AsyncMethodCall.Create(generator, instructions, original,
-            AccessTools.Method(typeof(BeforeRewardOfferedPatch), nameof(BeforeRewardsOfferedHooks)),
-            beforeState: original);
-    }
-
-    private static async Task BeforeRewardsOfferedHooks(IRunState runState,
+    [HarmonyPostfix]
+    public static IEnumerable<CardCreationResult> CardCreationHook(
+        IEnumerable<CardCreationResult> __result,
         Player player,
-        IReadOnlyList<Reward> rewards)
-    { 
-        CustomMessageWrapper.Send(new RewardsOfferedMessage(player, rewards));
+        int cardCount,
+        CardCreationOptions options)
+    {
+        var cards = __result.Select(r => r.Card);
+        CustomMessageWrapper.Send(new RewardsOfferedMessage(player, cards));
+        return __result;
     }
 }
 

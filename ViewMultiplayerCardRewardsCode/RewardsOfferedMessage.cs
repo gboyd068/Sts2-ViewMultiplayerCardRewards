@@ -12,37 +12,40 @@ using MegaCrit.Sts2.Core.Saves.Runs;
 class RewardsOfferedMessage : ICustomMessage
 {
     public Player player;
-    public List<List<CardModel>> groupedCards;
+    public IEnumerable<CardModel> Cards;
     
     public RewardsOfferedMessage() { }
         
-    public RewardsOfferedMessage(Player player, IReadOnlyList<Reward> rewards)
+    public RewardsOfferedMessage(Player player, IEnumerable<CardModel> cards)
     {
         this.ShouldBroadcast = true;
         this.player = player;
-        this.groupedCards = rewards
-            .OfType<CardReward>()
-            .Select(r => r.Cards
-                .ToList())
-            .ToList();
-        
+        this.Cards = cards;
+
     }
 
     public void Serialize(PacketWriter writer)
     {
         writer.Write(player.ToSerializable());
-        WriteNestedList(writer, groupedCards);
+        WriteNestedList(writer, [Cards.ToList()]);
     }
     
     public void Deserialize(PacketReader reader)
     {
         player = Player.FromSerializable(reader.Read<SerializablePlayer>());
-        groupedCards = ReadNestedList(reader);
+        var groupedCards = ReadNestedList(reader);
+        Cards = groupedCards.FirstOrDefault([]);
     }
 
     public void HandleMessage(ulong senderId)
     {
-        CardRewardsMap.Instance.Map[senderId] = groupedCards;
+        if (!CardRewardsMap.Instance.Map.TryGetValue(player.NetId, out var rewards))
+        {
+            rewards = new List<List<CardModel>>();
+            CardRewardsMap.Instance.Map[player.NetId] = rewards;
+        }
+
+        rewards.Add(Cards.ToList());
     }
 
     public bool ShouldBroadcast { get; } = true;
