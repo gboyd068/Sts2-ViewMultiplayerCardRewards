@@ -18,7 +18,9 @@ public static class PlayerCardRewardGroupsDisplay
             if (group.Count == 0)
                 continue;
             label.Show();
-            VBoxContainer groupContainer = new VBoxContainer();
+            GridContainer groupContainer = new GridContainer();
+            if (group.Count > 5)
+                groupContainer.Columns = 2;
             node.AddChild(groupContainer);
             foreach (var card in group)
             {
