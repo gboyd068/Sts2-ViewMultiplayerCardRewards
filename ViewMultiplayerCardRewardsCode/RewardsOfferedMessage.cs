@@ -3,6 +3,7 @@
 using BaseLib.Abstracts;
 using Godot;
 using MegaCrit.Sts2.Core.Entities.Players;
+using MegaCrit.Sts2.Core.Logging;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Multiplayer.Serialization;
 using MegaCrit.Sts2.Core.Nodes;
@@ -37,6 +38,20 @@ class RewardsOfferedMessage : ICustomMessage
         Cards = groupedCards.FirstOrDefault([]);
     }
 
+    private bool IsAlreadyPresentInMap(List<CardModel> cards)
+    {
+        if (CardRewardsMap.Instance.Map.TryGetValue(player.NetId, out List<List<CardModel>> mapEntry))
+        {
+            var titlesCollections = mapEntry.Select(cs => cs.Select(c => c.Title));
+            var cardTitles = cards.Select(c => c.Title);
+            if (titlesCollections.Any(titles => titles.SequenceEqual(cardTitles)))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+    
     public void HandleMessage(ulong senderId)
     {
         if (!CardRewardsMap.Instance.Map.TryGetValue(player.NetId, out var rewards))
@@ -45,7 +60,11 @@ class RewardsOfferedMessage : ICustomMessage
             CardRewardsMap.Instance.Map[player.NetId] = rewards;
         }
 
-        rewards.Add(Cards.ToList());
+        if (!IsAlreadyPresentInMap(Cards.ToList()))
+        {
+            rewards.Add(Cards.ToList());
+        }
+        
     }
 
     public bool ShouldBroadcast { get; } = true;
@@ -100,7 +119,7 @@ class RewardsOfferedMessage : ICustomMessage
 
 public partial class CardRewardsMap : Node
 {
-    public Dictionary<ulong, List<List<CardModel>>> Map = new Dictionary<ulong, List<List<CardModel>>>();
+    public Dictionary<ulong, List<List<CardModel>>> Map = new Dictionary<ulong, List<List<CardModel>>?>();
     
     public static CardRewardsMap Instance { get; set; } = new CardRewardsMap();
 }
