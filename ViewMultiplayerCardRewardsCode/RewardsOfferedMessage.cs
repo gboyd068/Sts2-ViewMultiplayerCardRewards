@@ -13,7 +13,7 @@ using MegaCrit.Sts2.Core.Saves.Runs;
 class RewardsOfferedMessage : ICustomMessage
 {
     public Player player;
-    public IEnumerable<CardModel> Cards;
+    public List<CardModel> Cards;
     
     public RewardsOfferedMessage() { }
         
@@ -21,21 +21,20 @@ class RewardsOfferedMessage : ICustomMessage
     {
         this.ShouldBroadcast = true;
         this.player = player;
-        this.Cards = cards;
+        this.Cards = cards.ToList();
 
     }
 
     public void Serialize(PacketWriter writer)
     {
         writer.Write(player.ToSerializable());
-        WriteNestedList(writer, [Cards.ToList()]);
+        WriteCardsList(writer, Cards);
     }
     
     public void Deserialize(PacketReader reader)
     {
         player = Player.FromSerializable(reader.Read<SerializablePlayer>());
-        var groupedCards = ReadNestedList(reader);
-        Cards = groupedCards.FirstOrDefault([]);
+        Cards = ReadCardsList(reader);
     }
 
     private bool IsAlreadyPresentInMap(List<CardModel> cards)
@@ -60,58 +59,42 @@ class RewardsOfferedMessage : ICustomMessage
             CardRewardsMap.Instance.Map[player.NetId] = rewards;
         }
 
-        if (!IsAlreadyPresentInMap(Cards.ToList()))
+        if (!IsAlreadyPresentInMap(Cards))
         {
-            rewards.Add(Cards.ToList());
+            rewards.Add(Cards);
         }
         
     }
 
     public bool ShouldBroadcast { get; } = true;
     
-    public static void WriteNestedList(
+    public static void WriteCardsList(
         PacketWriter writer,
-        List<List<CardModel>> data)
+        List<CardModel> data)
     {
         var serializable = data
-            .Select(g => g.Select(c => c.ToSerializable()).ToList())
-            .ToList();
+            .Select(c => c.ToSerializable()).ToList();
         
-        writer.WriteInt(data.Count);
+        writer.WriteInt(serializable.Count);
 
-        foreach (var group in serializable)
+        foreach (var item in serializable)
         {
-            writer.WriteInt(group.Count);
-
-            foreach (var item in group)
-                writer.Write(item);
+            writer.Write(item);
         }
     }
     
-    public static List<List<CardModel>> ReadNestedList(PacketReader reader)
+    public static List<CardModel> ReadCardsList(PacketReader reader)
     {
-        int outer = reader.ReadInt();
-        var result = new List<List<SerializableCard>>(outer);
-
-        for (int i = 0; i < outer; i++)
-        {
-            int inner = reader.ReadInt();
-            var group = new List<SerializableCard>(inner);
-
-            for (int j = 0; j < inner; j++)
-            {
-                group.Add(reader.Read<SerializableCard>());
-            }
-
-            result.Add(group);
-        }
         
-        return result
-            .Select(group =>
-                group
-                    .Select(CardModel.FromSerializable)
-                    .ToList()
-            )
+        int count = reader.ReadInt();
+        var group = new List<SerializableCard>(count);
+        for (int j = 0; j < count; j++)
+        {
+            group.Add(reader.Read<SerializableCard>());
+        }
+
+        return group
+            .Select(CardModel.FromSerializable)
             .ToList();
     }
 }
