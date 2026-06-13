@@ -59,6 +59,10 @@
         <None Include="ViewMultiplayerCardRewards/**"/>
     </ItemGroup>
 
+    <ItemGroup>
+      <Content Include="README.md" />
+    </ItemGroup>
+
     <Target Name="CheckDependencyPaths">
         <Error
                 Text=" Slay the Spire 2 data not found at path '$(Sts2DataDir)'"
