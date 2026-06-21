@@ -4,7 +4,7 @@
   "author": "gboyd068",
   "description": "View other players' card rewards in the multiplayer status menu.",
   "version": "v0.0.1",
-  "has_pck": false,
+  "has_pck": true,
   "has_dll": true,
   "dependencies": ["BaseLib"],
   "affects_gameplay": false
