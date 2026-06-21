@@ -3,9 +3,10 @@
   "name": "View Multiplayer Card Rewards",
   "author": "gboyd068",
   "description": "View other players' card rewards in the multiplayer status menu.",
-  "version": "v0.0.1",
+  "version": "v0.0.2",
   "has_pck": true,
   "has_dll": true,
-  "dependencies": ["BaseLib"],
+  "dependencies": [{"id": "BaseLib", "min_version":  "v3.3.1"}],
+  "min_game_version": "v0.107.1",
   "affects_gameplay": false
 }
