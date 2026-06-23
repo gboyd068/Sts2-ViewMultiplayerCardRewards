@@ -61,7 +61,10 @@ class RewardsOfferedMessage : ICustomMessage
 
         if (!IsAlreadyPresentInMap(Cards))
         {
-            rewards.Add(Cards);
+            if (Cards.Count > 1)
+            {
+                rewards.Add(Cards);
+            }
         }
         
     }

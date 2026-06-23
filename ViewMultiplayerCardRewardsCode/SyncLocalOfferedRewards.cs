@@ -16,6 +16,20 @@ using MegaCrit.Sts2.Core.Runs;
 namespace BaseLib.Patches.Hooks;
 
 [HarmonyPatch(
+    typeof(CardReward), nameof(CardReward.Populate))]
+class CardRewardPopulatePatch
+{
+    [HarmonyPostfix]
+    public static void PopulateHook(
+        CardReward __instance)
+    {
+        var cards = __instance.Cards;
+        CustomMessageWrapper.Send(new RewardsOfferedMessage(__instance.Player, cards));
+    }
+}
+
+
+[HarmonyPatch(
     typeof(CardFactory),
     nameof(CardFactory.CreateForReward),
     new[]
@@ -24,7 +38,7 @@ namespace BaseLib.Patches.Hooks;
         typeof(int),
         typeof(CardCreationOptions)
     })]
-class BeforeRewardOfferedPatch
+class CreateForRewardPatch
 {
     [HarmonyPostfix]
     public static IEnumerable<CardCreationResult> CardCreationHook(
